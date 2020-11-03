@@ -4,16 +4,9 @@ workflow:
   rules:
     - if: '$CI_COMMIT_BRANCH'
 
-pages:
-  script:
-    - gem install bundler
-    - bundle install
-    - bundle exec jekyll build -d public
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+before_script:
+  - gem install bundler
+  - bundle install
 
 pages:
   stage: deploy
@@ -22,5 +15,15 @@ pages:
   artifacts:
     paths:
       - public
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+test:
+  stage: test
+  script:
+    - bundle exec jekyll build -d test
+  artifacts:
+    paths:
+      - test
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "master"'
