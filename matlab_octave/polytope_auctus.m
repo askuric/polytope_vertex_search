@@ -43,10 +43,10 @@ f_vert = [];
 % matrix inverse counter
 inverse_count = 0;
 for i = 1:N 
-    # find all n-m 
+    % find all n-m 
     v_origin = v_origin_combinations(i,:);
     v_base = 1:n;
-    v_base(v_origin) = []; # remove the vectors on the faces
+    v_base(v_origin) = []; % remove the vectors on the faces
     
     % construct the matrix containing all origins of parallel n-m faces
     % there is 2^m faces possible 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="panda">
+  <xacro:arg name="gazebo_plugin" default="" />
+  <xacro:include filename="$(find panda_manips)/robots/panda_arm.xacro" />
+  <xacro:panda_arm gazebo_plugin="$(arg gazebo_plugin)"/>
+<!--   <xacro:ati /> -->
+</robot>

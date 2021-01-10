@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<launch>
+ 
+  <param name="robot_description" command="
+  $(find xacro)/xacro '$(find franka_description)/robots/panda_arm.urdf.xacro' robot_namespace:=panda_box"/> 
+  <param name="panda_table_robot_description" command="
+  $(find xacro)/xacro '$(find franka_description)/robots/panda_arm.urdf.xacro' robot_namespace:=panda_table"/>
+
+  <group ns="panda_box">
+    <!-- URDF state publisher -->
+    <node name="panda_box_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+      <param name="tf_prefix" value="panda_box"/>
+    </node>
+    <!-- panda_box panda description -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find franka_description)/robots/panda_arm.urdf.xacro' robot_namespace:=panda_box"/>
+    <node pkg="tf" type="static_transform_publisher" name="world_ns_connector" args="0.11 -1.15 -0.27 0 0 0 1 /world /panda_box/world 100" />
+    <!-- panda_box panda GUI for dk -->
+    <node pkg="joint_state_publisher" type="joint_state_publisher" output="screen" name="joint_state_publisher">
+      <param name="use_gui" value="true"/>
+      <param name="rate" value="30"/>
+    </node>
+    <!-- polytope calculating node -->
+    <node pkg="panda_capacity" name="panda_force_polytope" type="panda_force_polytope.py" args="topic:='qjoint_states'"/> 
+    <!-- ellipsoid calculating node -->
+    <node pkg="panda_capacity" name="panda_manipulability" type="panda_manipulability.py"/>
+  </group>
+
+  <group ns="panda_table">
+	  <!-- URDF state publisher -->
+    <node name="panda_table_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+      <remap from="robot_description" to="panda_table_robot_description" />
+      <param name="tf_prefix" value="panda_table"/>
+    </node>
+	  <!-- panda_table panda description -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find franka_description)/robots/panda_arm.urdf.xacro' robot_namespace:=panda_table"/>
+    <node pkg="tf" type="static_transform_publisher" name="world_ns_connector" args="0 0 0 0 0 0 1 /world /panda_table/world 100" />
+	  <!-- panda_table panda GUI for dk -->
+    <node pkg="joint_state_publisher" type="joint_state_publisher" output="screen" name="joint_state_publisher">
+      <param name="use_gui" value="true"/>
+      <param name="rate" value="30"/>
+    </node>
+    <!-- polytope calculating node -->
+    <node pkg="panda_capacity" name="panda_force_polytope" type="panda_force_polytope.py" args="topic:='joint_states'"/>
+    <!-- ellipsoid calculating node -->
+    <node pkg="panda_capacity" name="panda_manipulability" type="panda_manipulability.py"/>
+  </group>
+
+
+  <!-- Show in Rviz   -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find panda_capacity)/launch/config_two.rviz" required="true" output="screen"/>
+
+</launch>

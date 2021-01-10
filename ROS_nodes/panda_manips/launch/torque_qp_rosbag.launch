@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="robot_ip" default="192.16.0.2" />
+    <arg name="load_gripper" default="false" />
+    <arg name="sim" default="true" />
+    <param name="sim" value="$(arg sim)" />
+    <arg name="gazebo_plugin" default="torque_qp" />
+    
+    <group if="$(arg sim)">
+
+        <param unless="$(arg load_gripper)" name="robot_description" command="$(find xacro)/xacro '$(find panda_manips)/robots/panda_arm.urdf.xacro' gazebo_plugin:=$(arg gazebo_plugin)"/>
+        <group if="$(arg load_gripper)">
+            <param name="robot_description" command="$(find xacro)/xacro '$(find panda_manips)/robots/panda_arm_hand.urdf.xacro' gazebo_plugin:=$(arg gazebo_plugin)"/>
+            <node pkg="tf" type="static_transform_publisher" name="panda_leftfinger_connector" args="0 0.04 0.0584 0 0 0 /panda_hand /panda_leftfinger  100"/>
+            <node pkg="tf" type="static_transform_publisher" name="panda_rightfinger_connector" args="0 -0.04 0.0584 0 0 0 /panda_hand /panda_rightfinger  100"/>
+        </group>
+        
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+        <rosparam param="init_joint_positions">
+            panda_joint4: -1.57
+            panda_joint6:  1.57
+        </rosparam>
+        
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find panda_manips)/launch/robot.rviz"/>
+
+        <param name="joint_state_topic" value="joint_states"/> 
+        <!-- polytope calculating node -->
+        <node pkg="panda_capacity" name="panda_force_polytope" type="panda_force_polytope_maxZ.py"/>
+        <!-- ellipsoid calculating node -->
+        <node pkg="panda_capacity" name="panda_manipulability" type="panda_manipulability.py"/>
+    </group>
+</launch>
