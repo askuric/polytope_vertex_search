@@ -9,24 +9,24 @@ from scipy.spatial import ConvexHull, Delaunay
 
 
 # velocity manipulability calculation
-def manipulability_velocity(Jacobian_position):
+def manipulability_velocity(Jacobian_position, dq_max):
     # jacobian calculation
     Jac = Jacobian_position
     # limits scaling
     W = np.diagflat(dq_max)
     # calculate the singular value decomposition
-    U, S, V = np.linalg.svd(Jac*W)
+    U, S, V = np.linalg.svd(Jac.dot(W))
     # return the singular values and the unit vector angle
     return [S, U]
 
 # force manipulability calculation
-def manipulability_force(Jacobian_position):
+def manipulability_force(Jacobian_position, t_max):
     # jacobian calculation
     Jac = Jacobian_position
     # limits scaling
     W = np.linalg.pinv(np.diagflat(t_max))
     # calculate the singular value decomposition
-    U, S, V = np.linalg.svd(Jac*W)
+    U, S, V = np.linalg.svd(Jac.dot(W))
     # return the singular values and the unit vector angle
     return [np.divide(1,S), U]
 
