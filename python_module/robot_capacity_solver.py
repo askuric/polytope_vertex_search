@@ -31,86 +31,21 @@ def manipulability_force(Jacobian_position, t_max):
     return [np.divide(1,S), U]
 
 # maximal end effector force
-def force_polytope_intersection_auctus(q1,q2):
+def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
 
     # jacobian calculation
-    Jac1 = jacobian_position(q1)
-    Jac2 = jacobian_position(q2)
-    Jac =  np.hstack((Jac1,Jac2))
-    
-    m, n = Jac.shape
+    Jac =  np.hstack((Jacobian1,Jacobian2))
+    t_min = np.vstack((t1_min,t2_min))
+    t_max = np.vstack((t1_max,t1_max))
 
-    # calculate svd
-    U, S, V = np.linalg.svd(Jac)
-    r = np.linalg.matrix_rank(Jac)
-    V1 = np.array(V.transpose()[:,:m])
-    V2 = np.array(V.transpose()[:,m:])
-
-
-    J_n_invT = np.linalg.pinv(Jac.transpose())
-    gravity = np.vstack((gravity_torque(q1), gravity_torque(q2)))
-    T_min_g = T_min_int - gravity
-    t_max_g = t_max_int - gravity
-
-    f_vertex = []
-    t_vertex = []
-    # A loop to go through all pairs of adjacent vertices
-    for i in range(n):
-        for j in range(i+1, n):
-            for k in range(j+1, n):
-                # find all n-m face vector indexes
-                face_vectors = np.delete(range(n), [i, j, k]) 
-                S = T_min_g.copy()
-                S[i,[0,1,2,3]] = t_max_g[i]
-                S[j,[0,1,4,5]] = t_max_g[j]
-                S[k,[0,2,4,6]] = t_max_g[k]
-                S_v2 = V2.transpose().dot(S)
-
-                # vectors to be used
-                T = T_vec_int[:,face_vectors]
-                # solve the linear system for the edge vectors tl and tj
-                Z = V2.transpose().dot(-T)
-
-                # figure out if some solutions can be discarded
-                Z_min = Z.copy()
-                Z_min[Z_min > 0] = 0
-                Z_max = Z.copy()
-                Z_max[Z_max < 0] = 0
-                S_min = Z_min.dot(np.ones((n-m,1)))
-                S_max = Z_max.dot(np.ones((n-m,1)))
-                to_reject = np.any(S_v2 - S_min < - 10**-7, axis=0) + np.any(S_v2 - S_max > 10**-7, axis=0)
-                if np.all(to_reject): # all should be discarded
-                    continue
-                S = S[:,~to_reject]
-                S_v2 = V2.transpose().dot(S)
-                # check the rank and invert
-                Z_inv = np.linalg.pinv(Z)
-                                        
-                # calculate the forces for each face
-                X = Z_inv.dot(S_v2)
-                # check if inverse correct - all error 0
-                t_err = np.any( abs(S_v2 - Z.dot(X)) > 10**-7, axis=0) 
-                # remove the solutions that are not in polytope 
-                to_remove = (np.any(X < -10**-7, axis=0) + np.any(X - 1 > 10**-7 , axis=0)) + t_err
-                X= X[:, ~to_remove]
-                S= S[:, ~to_remove]
-                if t_vertex == []:
-                    t_vertex =  S+T.dot(X)
-                # add vertex torque
-                t_vertex = np.hstack((t_vertex, S+T.dot(X)))
-
-    t_vertex = make_unique(t_vertex)
-    # calculate the forces based on the vertex torques
-    f_vertex = J_n_invT*( t_vertex )
-
-    return f_vertex, t_vertex, gravity
+    return force_polytope_auctus(Jac, t_max,t_min)
 
 # maximal end effector force
-def force_polytope_sum_auctus(q1,q2):
+def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
 
-    f_vertex1, t_vertex1, gravity1 = force_polytope_auctus(q1)
-    f_vertex2, t_vertex2, gravity2 = force_polytope_auctus(q2)
-    
+    f_vertex1, t_vertex1, gravity1 = force_polytope_auctus(Jacobian1, t1_max, t1_min)
+    f_vertex2, t_vertex2, gravity2 = force_polytope_auctus(Jacobian2, t2_max, t2_min)
+    m, n = Jacobian1.shape
     f_sum = np.zeros((f_vertex1.shape[1]*f_vertex2.shape[1],m))
     for i in range(f_vertex1.shape[1]):
         for j in range(f_vertex2.shape[1]):
@@ -119,12 +54,11 @@ def force_polytope_sum_auctus(q1,q2):
     hull = ConvexHull(f_sum, qhull_options='QJ')
     f_vertex = np.array(f_sum[hull.vertices]).T
 
-    polytope = []
+    polytope_faces = []
     for face in hull.simplices:
-        polytope.append(np.array(f_sum[face]).T)
+        polytope_faces.append(np.array(f_sum[face]).T)
 
-    return f_vertex, polytope
-
+    return f_vertex, polytope_faces
 
 # maximal end effector force
 def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
@@ -203,37 +137,38 @@ def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
     # calculate the forces based on the vertex torques
     f_vertex = J_n_invT.dot( t_vertex )
     return f_vertex, t_vertex, gravity
-
     
 def force_polytope_ordered(Jacobian, t_max, t_min, gravity = None):
     force_vertex, t_vertex, gravity = force_polytope_auctus(Jacobian, t_max, t_min, gravity)
     m, n = Jacobian.shape
-    t_max_int =  np.vstack((t_max,t_max))
-    t_min_int = -t_max_int
     
-    polytopes = []
+    polytope_faces = []
     if force_vertex.shape[0] == 1:
-        polytopes.append(force_vertex)
+        polytope_faces.append(force_vertex)
     elif force_vertex.shape[0] == 2:
-        polytopes.append(force_vertex[:, order_index(force_vertex)])
+        polytope_faces.append(force_vertex[:, order_index(force_vertex)])
     else:        
         for i in range(n):
-            fi = np.array(force_vertex[:,np.isclose(t_vertex[i,:], (t_min_int[i] - gravity[i]),1e-5)])
+            fi = np.array(force_vertex[:,np.isclose(t_vertex[i,:], (t_min[i] - gravity[i]),1e-5)])
             if fi != []:
                 if fi.shape[1] > 3:
-                    polytopes.append(fi[:,order_index(make_2d(fi))])
+                    polytope_faces.append(fi[:,order_index(make_2d(fi))])
                 else: 
-                    polytopes.append(fi)
-            fi = np.array(force_vertex[:,np.isclose(t_vertex[i,:], (t_max_int[i] - gravity[i]),1e-5)])
+                    polytope_faces.append(fi)
+            fi = np.array(force_vertex[:,np.isclose(t_vertex[i,:], (t_max[i] - gravity[i]),1e-5)])
             if fi != []:
                 if fi.shape[1] > 3:
-                    polytopes.append(fi[:,order_index(make_2d(fi))])
+                    polytope_faces.append(fi[:,order_index(make_2d(fi))])
                 else: 
-                    polytopes.append(fi)
-    return [force_vertex, polytopes]
+                    polytope_faces.append(fi)
+    return [force_vertex, polytope_faces]
 
-def force_polytope_intersection_ordered(q1,q2):
-    force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(q1,q2)
+def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
+    force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min)
+    m, n = Jacobian1.shape
+    t_max_int = np.vstack((t1_max,t2_max))
+    t_min_int = np.vstack((t1_min,t2_min))
+
     polytopes = []
     for i in range(2*n):
         fi = np.array(force_vertex[:,np.isclose(t_vertex[i,:], (t_min_int[i] - gravity[i]),1e-5)])
@@ -284,4 +219,4 @@ def make_unique(points):
          
 # definition of the four_link_solver module
 if __name__ == '__main__':
-    polytope_solver() 
+    robot_capacity_solver() 
