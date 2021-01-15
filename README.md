@@ -3,7 +3,7 @@
 *by Antun Skuric, Vincent Padois, David Daney*<br>
 *Submitted to ICRA2021*
 
-![alt](images/rviz_screenshot_2020.png)
+<img src="images/rviz_screenshot_2020.png" height="250px">
 
 New on-line polytope vertex search algorithm optimised for force and velocity polytope evaluation of serial robots.
 
@@ -15,7 +15,7 @@ This repository consists of
     - force polytope
     - force/velocity manipulability ellipsoid
     - quick demo jupyter script
-- ROS node for *FRANKA Emika Panda* robot
+- [ROS node for *FRANKA Emika Panda* robot](#ros-panda-capacity-package)
 
 
 
@@ -48,7 +48,7 @@ P.Chiacchio, Pierrot et al.*
 [f_vert, matrix_inverse_count] = polytope_sasaki(Jacobian_mat,tau_min,tau_max);
 ```
 
-## Python capacity module 
+## Python capacity module
 
 In the directory `python_module` you can find the generic robot capacity calculation module called `robot_capacity_solver` which you can easily integrate in your python project, for example
 ```python
@@ -84,4 +84,6 @@ def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2
 # returns the force vertices and face polygons with ordered vertices
 def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
 ```
-See `demo_notebook.ipynb` for one example use case of the module.
+See [`demo_notebook.ipynb`](python_module/demo_notebook.ipynb) for one example use case of the module.
+
+## ROS panda capacity package
