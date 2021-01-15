@@ -13,7 +13,7 @@
     </node>
     <!-- panda_box panda description -->
     <param name="robot_description" command="$(find xacro)/xacro '$(find franka_description)/robots/panda_arm.urdf.xacro' robot_namespace:=panda_box"/>
-    <node pkg="tf" type="static_transform_publisher" name="world_ns_connector" args="0.11 -1.15 -0.27 0 0 0 1 /world /panda_box/world 100" />
+    <node pkg="tf" type="static_transform_publisher" name="world_ns_connector" args="0.11 -1.15 0 0 0 0 1 /world /panda_box/world 100" />
     <!-- panda_box panda GUI for dk -->
     <node pkg="joint_state_publisher" type="joint_state_publisher" output="screen" name="joint_state_publisher">
       <param name="use_gui" value="true"/>
