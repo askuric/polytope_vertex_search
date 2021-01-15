@@ -43,7 +43,7 @@ P.Chiacchio, Pierrot et al.*
 [f_vert, matrix_inverse_count] = polytope_pierrot(Jacobian_mat,tau_min,tau_max);
 ```
 
-> *Vertex search algorithm of convex polyhedron representing upperlimb manipulation ability  <br> by Sasaki et al.*
+> *Vertex search algorithm of convex polyhedron representing upper limb manipulation ability  <br> by Sasaki et al.*
 ```matlab
 [f_vert, matrix_inverse_count] = polytope_sasaki(Jacobian_mat,tau_min,tau_max);
 ```
@@ -92,19 +92,52 @@ In the `ROS_nodes` directory you can find the implementation of the python capac
 - panda_capacity: the capacity solver for Panda robot
 
 ### Install the ros packages - using catkin
+To run panda robot capacity calculation nodes first download the git repository to your pc and then create new catkin workspace:
+```shell
+mkdir ~/capacity_ws && cd ~/capacity_ws/
+mkdir src && cd src
+```
+Then you can copy the folders from ROS_nodes into the `capacity_ws/src` folder for example:
+```shell
+cp  ~/polytope_vertex_search/ROS_nodes/* .
+```
+Finally you can build the workspace
+```shell
+cd ..
+catkin_make
+```
+And you should be ready to go!
+
+
+#### Visualisation dependancies
+For visualizing the polytopes in RVZ you will need to install the [jsk-rviz-plugin](https://github.com/jsk-ros-pkg/jsk_visualization)
+
+```sh
+sudo apt install ros-kinetic-jsk-rviz-plugins
+```
 
 ### One panda simulation
+Once when you have everything installed you will be able to run the interactive simulations and see the polytope being visualised in real-time.
+
 <img src="images/one_panda.png" height="250px">
 
+To see a simulation with one panda robot and its force and velocity manipulatibility ellipsoid and polytope run the command in the terminal.
+
 ```shell
+source ~/capacity_ws/devel/setup.bash 
 roslaunch panda_capacity one_panda.launch
 ```
 
 
 ### Two panda simulation
+
+To demonstrate the collaborative robotics applications of our algorithm we have provided an interactive simulation of two panda robots where use can visualise their separate and joint force capacities. 
+
 <img src="images/two_panda.png" height="250px">
 
+For the interactive simulation of two panda robots with their own capacity measures you can simply run the commands:
 ```shell
+source ~/capacity_ws/devel/setup.bash 
 roslaunch panda_capacity two_panda.launch
 ```
 
