@@ -67,44 +67,10 @@ def jacobian_pseudo_inv(q):
 
 # iterative solving of inverse kinematics
 def ik_solve(x_d, q_0, iterations):
-    """
-    q = q_0
-    damping = 0.1
-    for i in range(iterations):
-        e = (x_d - forward(q))
-        # jacobian transpose method
-        # damped pseudo-inverse method
-        q = q + np.linalg.inv(np.transpose(jacobian_position(q)).dot(jacobian_position(q)) + damping*np.identity(n)).dot(np.transpose(jacobian_position(q))).dot(e).T
-    return np.array(q).ravel()
-    """
     return  kdl_kin.inverse(x_d, q_0)
 
 def gravity_torque(q):
     return np.array([kdl_kin.gravity(q)]).T
-
-#def mass_matrix(q):
-    #q1 = q[0]
-    #q2 = q[1]
-    #q3 = q[2]
-    #q4 = q[3]
-    #return np.matrix([[L[1]**2*m[2] + L[1]**2*m[3] + L[1]**2*(m[4] + m[5]) + 2*L[1]*L[2]*m[3]*cos(q2) + 2*L[1]*L[2]*(m[4] + m[5])*cos(q2) + 2*L[1]*L[3]*(m[4] + m[5])*cos(q2 + q3) + 2*L[1]*m[2]*r[2]*cos(q2) + 2*L[1]*m[3]*r[3]*cos(q2 + q3) + 2*L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]**2*m[3] + L[2]**2*(m[4] + m[5]) + 2*L[2]*L[3]*(m[4] + m[5])*cos(q3) + 2*L[2]*m[3]*r[3]*cos(q3) + 2*L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[1]*r[1]**2 + m[2]*r[2]**2 +m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[1]*L[2]*m[3]*cos(q2) + L[1]*L[2]*(m[4] + m[5])*cos(q2) + L[1]*L[3]*(m[4] + m[5])*cos(q2 + q3) + L[1]*m[2]*r[2]*cos(q2) + L[1]*m[3]*r[3]*cos(q2 + q3) + L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]**2*m[3] + L[2]**2*(m[4] + m[5]) + 2*L[2]*L[3]*(m[4] + m[5])*cos(q3) + 2*L[2]*m[3]*r[3]*cos(q3) + 2*L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[2]*r[2]**2 + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[1]*L[3]*(m[4] + m[5])*cos(q2 + q3) + L[1]*m[3]*r[3]*cos(q2 + q3) + L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]*L[3]*(m[4] + m[5])*cos(q3) + L[2]*m[3]*r[3]*cos(q3) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2],
-    #    [ L[1]*L[2]*m[3]*cos(q2) + L[1]*L[2]*(m[4] + m[5])*cos(q2) + L[1]*L[3]*(m[4] + m[5])*cos(q2 + q3) + L[1]*m[2]*r[2]*cos(q2) + L[1]*m[3]*r[3]*cos(q2 + q3) +L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]**2*m[3] + L[2]**2*(m[4] + m[5]) + 2*L[2]*L[3]*(m[4] + m[5])*cos(q3) + 2*L[2]*m[3]*r[3]*cos(q3) + 2*L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[2]*r[2]**2 +m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[2]**2*m[3] + L[2]**2*(m[4] + m[5]) + 2*L[2]*L[3]*(m[4] + m[5])*cos(q3) + 2*L[2]*m[3]*r[3]*cos(q3) + 2*L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[2]*r[2]**2 + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[2]*L[3]*(m[4] + m[5])*cos(q3) + L[2]*m[3]*r[3]*cos(q3) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2],
-    #    [ L[1]*L[3]*(m[4] + m[5])*cos(q2 + q3) + L[1]*m[3]*r[3]*cos(q2 + q3) + L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]*L[3]*(m[4] + m[5])*cos(q3) + L[2]*m[3]*r[3]*cos(q3) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) +m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[2]*L[3]*(m[4] + m[5])*cos(q3) + L[2]*m[3]*r[3]*cos(q3) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[3]**2*(m[4] + m[5]) + 2*L[3]*(m[4] + m[5])*r[4]*cos(q4) + m[3]*r[3]**2 + (m[4] + m[5])*r[4]**2, L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2],
-    #    [ L[1]*(m[4] + m[5])*r[4]*cos(q2 + q3 + q4) + L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2, L[2]*(m[4] + m[5])*r[4]*cos(q3 + q4) + L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2, L[3]*(m[4] + m[5])*r[4]*cos(q4) + (m[4] + m[5])*r[4]**2, (m[4] + m[5])*r[4]**2]])
-
-#def equivalent_mass(q):
-    # mass matrix calculation
-    #M = mass_matrix(q)
-    # jacobian calculation
-    #Jac = J(q)
-    # take only y and z direction
-    #Jac = Jac[4:, :]
-    # inverse of equivalent mass 
-    #m_inv = Jac.dot(np.linalg.inv(M).dot(np.transpose(Jac)))
-    # limit the infinite mass 
-    #m_inv[m_inv == 0] = 0.01
-    # calculate the inverted mass
-    #return  1/m_inv
 
 # velocity manipulability calculation
 def manipulability_velocity(q, direction = None):
@@ -327,8 +293,8 @@ def force_polytope_auctus(q, direction = None, force = None):
     T_vec = np.diagflat(t_max-t_min)
 
     if force is None:
-        #gravity = np.zeros((n,1))
-        gravity = np.zeros((n,1))#gravity_torque(q)
+        # gravity = np.zeros((n,1))
+        gravity = gravity_torque(q)
     else:
         tn = np.asarray(Jac_full.T.dot(force).T)
         gravity = gravity_torque(q) + tn
@@ -390,78 +356,8 @@ def force_polytope_auctus(q, direction = None, force = None):
     f_vertex = J_n_invT*( t_vertex )
     return f_vertex, t_vertex, gravity
 
-
-# maximal end effector force
-def force_polytope_auctus_old(q):
-
-    # jacobian calculation
-    Jac = jacobian_position(q)
-    # calculate svd
-    U, S, V = np.linalg.svd(Jac)
-    r = np.linalg.matrix_rank(Jac)
-    V1 = np.array(V.transpose()[:,:m])
-    V2 = np.array(V.transpose()[:,m:])
-
-    J_n_invT = np.linalg.pinv(Jac.transpose())
-
-    gravity = gravity_torque(q)
-    T_min_g = T_min - gravity
-    t_max_g = t_max - gravity
-
-    f_vertex = []
-    t_vertex = []
-
-    # A loop to go through all pairs of adjacent vertices
-    for i in range(n):
-        for j in range(i+1, n):
-            for k in range(j+1, n):
-                # find all n-m face vector indexes
-                face_vectors = np.delete(range(n), [i, j, k]) 
-                S = T_min_g.copy()
-                S[i,[0,1,2,3]] = t_max_g[i]
-                S[j,[0,1,4,5]] = t_max_g[j]
-                S[k,[0,2,4,6]] = t_max_g[k]
-                S_v2 = V2.transpose().dot(S)
-
-                # vectors to be used
-                T = T_vec[:,face_vectors]
-                # solve the linear system for the edge vectors tl and tj
-                Z = V2.transpose().dot(-T)
-
-                # figure out if some solutions can be discarded
-                Z_min = Z.copy()
-                Z_min[Z_min > 0] = 0
-                Z_max = Z.copy()
-                Z_max[Z_max < 0] = 0
-                S_min = Z_min.dot(np.ones((n-m,1)))
-                S_max = Z_max.dot(np.ones((n-m,1)))
-                to_reject = np.any(S_v2 - S_min < - 10**-7, axis=0) + np.any(S_v2 - S_max > 10**-7, axis=0)
-                if np.all(to_reject): # all should be discarded
-                    continue
-                S = S[:,~to_reject]
-                S_v2 = V2.transpose().dot(S)
-                
-                # check the rank and invert
-                Z_inv = np.linalg.pinv(Z)
-                                        
-                # calculate the forces for each face
-                X = Z_inv.dot(S_v2)
-                # check if inverse correct - all error 0
-                t_err = np.any( abs(S_v2 - Z.dot(X)))
-                # remove the solutions that are not in polytope 
-                to_remove = (np.any(X < -10**-7, axis=0) + np.any(X - 1 > 10**-7 , axis=0)) + t_err
-                X= X[:, ~to_remove]
-                S= S[:, ~to_remove]
-                if t_vertex == []:
-                    t_vertex =  S+T.dot(X)
-                # add vertex torque
-                t_vertex = np.hstack((t_vertex, S+T.dot(X)))
-
-    t_vertex = make_unique(t_vertex)
-    # calculate the forces based on the vertex torques
-    f_vertex = J_n_invT*( t_vertex )
-    return f_vertex, t_vertex, gravity
-    
+# returns the force polytope vertices 
+# and the list of faces with ordered vertices
 def force_polytope_ordered(q, direction = None, force = None):
     force_vertex, t_vertex, gravity = force_polytope_auctus(q, direction, force)
     polytopes = []
@@ -485,6 +381,8 @@ def force_polytope_ordered(q, direction = None, force = None):
                     polytopes.append(fi)
     return [force_vertex, polytopes]
 
+# returns the vertices of intersection of force polytopes  
+# and the list of faces with ordered vertices
 def force_polytope_intersection_ordered(q1,q2):
     force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(q1,q2)
     polytopes = []
@@ -503,7 +401,7 @@ def force_polytope_intersection_ordered(q1,q2):
                 polytopes.append(fi)
     return [force_vertex, polytopes]
 
-
+# take coplanar points and project them in 2d
 def make_2d(points):
     U = points[:,1]-points[:,0]   # define 1st ortogonal vector
     for i in range(2, points.shape[1]): # find 2nd ortogonal vector (avoid collinear)
@@ -521,7 +419,7 @@ def make_2d(points):
     y = V.dot(points)
 
     return np.array([x, y])
-
+# order the points 
 def order_index(points):
     px = np.array(points[0,:]).ravel()
     py = np.array(points[1,:]).ravel()
@@ -530,7 +428,7 @@ def order_index(points):
     angles = np.arctan2( (py-p_mean[1]), (px-p_mean[0]))
     sort_index = np.argsort(angles)
     return sort_index
-
+# remove repeating solutions
 def make_unique(points):
     unique_points = np.unique(np.around(points,7), axis=1)
     return unique_points

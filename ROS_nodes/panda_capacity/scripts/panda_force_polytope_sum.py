@@ -37,9 +37,9 @@ def plot_polytope(q1,q2):
     pointcloud_massage = PointCloud()
     for i in range(force_vertex.shape[1]):
         point = Point32()
-        point.x = force_vertex[0,i]/2000 + pose[0]
-        point.y = force_vertex[1,i]/2000 + pose[1]
-        point.z = force_vertex[2,i]/2000 + pose[2]
+        point.x = force_vertex[0,i]/500 + pose[0]
+        point.y = force_vertex[1,i]/500 + pose[1]
+        point.z = force_vertex[2,i]/500 + pose[2]
         pointcloud_massage.points.append(point)
 
     
@@ -51,9 +51,9 @@ def plot_polytope(q1,q2):
         polygon_massage = Polygon()
         for i in range(face_polygon.shape[1]):
             point = Point32()
-            point.x = face_polygon[0,i]/2000 + pose[0]
-            point.y = face_polygon[1,i]/2000 + pose[1]
-            point.z = face_polygon[2,i]/2000 + pose[2]
+            point.x = face_polygon[0,i]/500 + pose[0]
+            point.y = face_polygon[1,i]/500 + pose[1]
+            point.z = face_polygon[2,i]/500 + pose[2]
             polygon_massage.points.append(point)
 
         # polytope stamped message

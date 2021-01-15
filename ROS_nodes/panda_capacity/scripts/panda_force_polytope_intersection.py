@@ -33,7 +33,7 @@ def plot_polytope(q1,q2):
     force_vertex, force_polytopes = panda.force_polytope_intersection_ordered(q1,q2)
     end = time.time()
     print end - start
-    """
+   
     pointcloud_massage = PointCloud()
     for i in range(force_vertex.shape[1]):
         point = Point32()
@@ -41,7 +41,7 @@ def plot_polytope(q1,q2):
         point.y = force_vertex[1,i]/500 + pose[1]
         point.z = force_vertex[2,i]/500 + pose[2]
         pointcloud_massage.points.append(point)
-    """
+    
     polygonarray_message = PolygonArray()
     polygonarray_message.header = Header()
     polygonarray_message.header.frame_id = namespace+'panda_link0'
@@ -69,7 +69,7 @@ def plot_polytope(q1,q2):
     publish_force_polytope = rospy.Publisher('/combined/panda/force_polytope', PolygonArray, queue_size=1)
     publish_force_polytope.publish(polygonarray_message)
     
-    """
+    
     # polytop stamped message
     pointcloud_massage.header = Header()
     pointcloud_massage.header.frame_id = namespace+'panda_link0'
@@ -77,7 +77,8 @@ def plot_polytope(q1,q2):
     # publish plytop
     publish_force_polytop_vertex = rospy.Publisher('/combined/panda/force_polytope_vertex', PointCloud, queue_size=1)
     publish_force_polytop_vertex.publish(pointcloud_massage)
-    """
+    
+    
     #fmax = panda.max_force_in_direction(q1,[0,0,1])
     #f_max_msg = Float64(fmax)
     #publish_fmax = rospy.Publisher(namespace+'panda/max_force', Float64, queue_size=10)
