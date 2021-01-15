@@ -87,3 +87,39 @@ def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_m
 See [`demo_notebook.ipynb`](python_module/demo_notebook.ipynb) for one example use case of the module.
 
 ## ROS panda capacity package
+In the `ROS_nodes` directory you can find the implementation of the python capacity module for a specific use case of Panda robot. The directory consists of two ros packages:
+- hkl-kdl: a fork of  http://wiki.ros.org/hrl-kdl
+- panda_capacity: the capacity solver for Panda robot
+
+### Install the ros packages - using catkin
+
+### One panda simulation
+<img src="images/one_panda.png" height="250px">
+
+```shell
+roslaunch panda_capacity one_panda.launch
+```
+
+
+### Two panda simulation
+<img src="images/two_panda.png" height="250px">
+
+```shell
+roslaunch panda_capacity two_panda.launch
+```
+
+#### Minkowski sum of polytopes
+<img src="images/minkowski.png" height="250px">
+
+Open a new terminal and run the command:
+```shell
+rosrun panda_capacity panda_force_polytope_sum.py
+```
+
+#### Intersection of polytopes
+<img src="images/intersect.png" height="250px">
+
+Open a new terminal and run the command:
+```shell
+rosrun panda_capacity panda_force_polytope_intersection.py
+```
