@@ -5,14 +5,20 @@ import numpy as np
 from visualization_msgs.msg import Marker
 from sensor_msgs.msg import JointState
 # robot module import
-import panda_solver as panda
+from capacity.robot_solver import RobotSolver 
+# capacity visualisation utils
+import capacity.capacity_visual_utils as capacity_utils
 
-
-namespace = rospy.get_namespace()
-
-namespace = rospy.get_namespace()
-
+# initial joint positions
 joint_positions = [0,0,0,0,0,0,0]
+
+# instance of robot solver
+panda = RobotSolver("panda_link0", "panda_link8")
+# getting the node namespace
+namespace = rospy.get_namespace()
+# base frame name
+frame = namespace+panda.base_link
+
 
 # function receiveing the new joint positions
 def callback(data):
@@ -20,67 +26,21 @@ def callback(data):
     joint_positions = data.position
 
 # function drawing the marker upon receiving new joint positions
-def draw_ellipsoids(q):
+def draw_ellipsoids(q, scaling_vel = 5, scaling_force = 500):
 
     # calculate dk of the robot
+    # just for visualisation - to display the ellipsoid on the tip of the robot
     pose = panda.dk_position(q)
     
-    # calculate dk of the robot.
-    manipulability_v = panda.manipulability_velocity(q)
-    Rot_v = np.identity(4)
-    Rot_v[0:3,0:3] = manipulability_v[1]
-    S = manipulability_v[0]
+    # calculate manip velocity
+    sing_val, U = panda.manipulability_velocity(q)
+    publish_manip_vel = rospy.Publisher(namespace+'panda/manip_velocity', Marker, queue_size=10)
+    publish_manip_vel.publish(capacity_utils.create_ellipsoid_msg(sing_val, U, pose, frame, scaling_vel))
 
-    marker = Marker()
-    marker.header.frame_id = namespace+"panda_link0"
-    marker.pose.position.x = pose[0]
-    marker.pose.position.y = pose[1]
-    marker.pose.position.z = pose[2]
-    quaternion =  tf.transformations.quaternion_from_matrix( Rot_v)
-    marker.pose.orientation.x = quaternion[0]
-    marker.pose.orientation.y = quaternion[1]
-    marker.pose.orientation.z = quaternion[2]
-    marker.pose.orientation.w = quaternion[3]
-
-    marker.type = marker.SPHERE
-    marker.color.g = 1.0
-    marker.color.r = 0.7
-    marker.color.a = 0.5
-    marker.scale.x = 2*S[0]/5
-    marker.scale.y = 2*S[1]/5
-    marker.scale.z = 2*S[2]/5
-
-    publish_manip1 = rospy.Publisher(namespace+'panda/manip_velocity', Marker, queue_size=10)
-    publish_manip1.publish(marker)
-
-    # calculate manipulability
-    manipulability_f = panda.manipulability_force(q)
-    Rot_f = np.identity(4)
-    Rot_f[0:3,0:3] = manipulability_f[1]
-    S = manipulability_f[0]
-    marker = Marker()
-    marker.header.frame_id = namespace+"panda_link0"
-    marker.pose.position.x = pose[0]
-    marker.pose.position.y = pose[1]
-    marker.pose.position.z = pose[2]
-    quaternion = tf.transformations.quaternion_from_matrix( Rot_f)
-    #type(pose) = geometry_msgs.msg.Pose
-    marker.pose.orientation.x = quaternion[0]
-    marker.pose.orientation.y = quaternion[1]
-    marker.pose.orientation.z = quaternion[2]
-    marker.pose.orientation.w = quaternion[3]
-
-    marker.type = marker.SPHERE
-    marker.color.g = 0.7
-    marker.color.r = 1.0
-    marker.color.a = 0.5
-    marker.scale.x = 2*S[0]/500
-    marker.scale.y = 2*S[1]/500
-    marker.scale.z = 2*S[2]/500
-
-    publish_manip1 = rospy.Publisher(namespace+'panda/manip_force', Marker, queue_size=10)
-
-    publish_manip1.publish(marker)
+    # calculate manip force
+    sing_val, U = panda.manipulability_force(q)
+    publish_manip_force = rospy.Publisher(namespace+'panda/manip_force', Marker, queue_size=10)
+    publish_manip_force.publish(capacity_utils.create_ellipsoid_msg(sing_val, U, pose, frame, scaling_force))
 
 # main funciton of the class
 def panda_manipulability():

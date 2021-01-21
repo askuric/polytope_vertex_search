@@ -31,20 +31,25 @@ def manipulability_force(Jacobian_position, t_max):
     return [np.divide(1,S), U]
 
 # maximal end effector force
-def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
+def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2):
 
     # jacobian calculation
     Jac =  np.hstack((Jacobian1,Jacobian2))
     t_min = np.vstack((t1_min,t2_min))
     t_max = np.vstack((t1_max,t1_max))
+    if gravity1 is None:
+        gravity = None
+    else:
+        gravity = np.vstack((gravity1, gravity2))
 
-    return force_polytope_auctus(Jac, t_max,t_min)
+    return force_polytope_auctus(Jac, t_max,t_min, gravity)
 
 # maximal end effector force
-def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
-
-    f_vertex1, t_vertex1, gravity1 = force_polytope_auctus(Jacobian1, t1_max, t1_min)
-    f_vertex2, t_vertex2, gravity2 = force_polytope_auctus(Jacobian2, t2_max, t2_min)
+def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1 = None, gravity2 = None):
+    # calculate two polytopes
+    f_vertex1, t_vertex1, gravity1 = force_polytope_auctus(Jacobian1, t1_max, t1_min, gravity1)
+    f_vertex2, t_vertex2, gravity2 = force_polytope_auctus(Jacobian2, t2_max, t2_min, gravity2)
+    # then do a minkowski sum
     m, n = Jacobian1.shape
     f_sum = np.zeros((f_vertex1.shape[1]*f_vertex2.shape[1],m))
     for i in range(f_vertex1.shape[1]):
@@ -68,7 +73,7 @@ def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
     m, n = Jac.shape
 
     # if gravity not specified
-    if gravity == None:
+    if gravity is None:
         gravity = np.zeros((n,1))
 
     # calculate svd
@@ -163,8 +168,8 @@ def force_polytope_ordered(Jacobian, t_max, t_min, gravity = None):
                     polytope_faces.append(fi)
     return [force_vertex, polytope_faces]
 
-def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
-    force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min)
+def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1=None, gravity2=None):
+    force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2)
     m, n = Jacobian1.shape
     t_max_int = np.vstack((t1_max,t2_max))
     t_min_int = np.vstack((t1_min,t2_min))
@@ -219,4 +224,4 @@ def make_unique(points):
          
 # definition of the four_link_solver module
 if __name__ == '__main__':
-    robot_capacity_solver() 
+    capacity_solver() 

@@ -33,6 +33,6 @@ def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2
 ```python
 # structured minkowski sum of force polytopes of two robots 
 # returns the force vertices and face polygons with ordered vertices
-def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
+def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
 ```
 See `demo_notebook.ipynb` for one example use case of the module.

@@ -82,14 +82,15 @@ def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2
 ```python
 # structured minkowski sum of force polytopes of two robots 
 # returns the force vertices and face polygons with ordered vertices
-def force_polytope_sum_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
+def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
 ```
 See [`demo_notebook.ipynb`](python_module/demo_notebook.ipynb) for one example use case of the module.
 
 ## ROS panda capacity package
 In the `ROS_nodes` directory you can find the implementation of the python capacity module for a specific use case of Panda robot. The directory consists of two ros packages:
 - hkl-kdl: a fork of  http://wiki.ros.org/hrl-kdl
-- panda_capacity: the capacity solver for Panda robot
+- franka_description: Panda robot definitions from Franka Emika  http://wiki.ros.org/franka_description
+- **panda_capacity: the capacity solver for Panda robot**
 
 ### Install the ros packages - using catkin
 To run panda robot capacity calculation nodes first download the git repository to your pc and then create new catkin workspace:
@@ -101,6 +102,7 @@ Then you can copy the folders from ROS_nodes into the `capacity_ws/src` folder f
 ```shell
 cp  ~/polytope_vertex_search/ROS_nodes/* .
 ```
+
 Finally you can build the workspace
 ```shell
 cd ..
@@ -109,11 +111,12 @@ catkin_make
 And you should be ready to go!
 
 
+
 #### Visualisation dependancies
 For visualizing the polytopes in RVZ you will need to install the [jsk-rviz-plugin](https://github.com/jsk-ros-pkg/jsk_visualization)
 
 ```sh
-sudo apt install ros-kinetic-jsk-rviz-plugins
+sudo apt install ros-*-jsk-rviz-plugins # melodic/kinetic... your ros version
 ```
 
 ### One panda simulation
