@@ -93,7 +93,12 @@ In the `ROS_nodes` directory you can find the implementation of the python capac
 - **panda_capacity: the capacity solver for Panda robot**
 
 ### Install the ros packages - using catkin
-To run panda robot capacity calculation nodes first download the git repository to your pc and then create new catkin workspace:
+To run panda robot capacity calculation nodes first clone the repository and submodules:
+```shell
+git clone --recurse-submodules git@gitlab.inria.fr:askuric/polytope_vertex_search.git
+```
+
+Then create new catkin workspace:
 ```shell
 mkdir ~/capacity_ws && cd ~/capacity_ws/
 mkdir src && cd src
