@@ -1,0 +1,3 @@
+[submodule "ROS_nodes/franka_description"]
+	path = ROS_nodes/franka_description
+	url = git@gitlab.inria.fr:auctus/panda/franka_description.git
