@@ -105,7 +105,7 @@ mkdir src && cd src
 ```
 Then you can copy the folders from ROS_nodes into the `capacity_ws/src` folder for example:
 ```shell
-cp  ~/polytope_vertex_search/ROS_nodes/* .
+cp -r ~/polytope_vertex_search/ROS_nodes/* .
 ```
 
 Finally you can build the workspace
