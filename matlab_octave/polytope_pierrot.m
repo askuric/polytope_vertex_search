@@ -44,7 +44,7 @@ for i = 1:2*n-2
           alpha_vertex = [alpha_vertex alpha'];
           t_vertex = [t_vertex sum(alpha.*V1, 2)];
         end
-        inverse_count++;
+        inverse_count = inverse_count + 1;
       end
     end
   end

@@ -37,13 +37,13 @@ for i = 1:n-1
         T2 = V12*inv(V11)*T1;
         
         % if T2 possible 
-        to_use = any(t_max'(rest_ind,:) - T2 < 0) + any(t_min'(rest_ind,:) - T2 > 0) == 0;
+        to_use = any(t_max(:, rest_ind)' - T2 < 0, 1) + any(t_min(:,rest_ind)' - T2 > 0,1) == 0;
         % rebuiild the torque vectors
         t_i = zeros(n,2^m);
         t_i([i,j,l],:) = T1;
         t_i(rest_ind,:) = T2;
         t_vertex = [t_vertex t_i(:,to_use)];
-        inverse_count++;
+        inverse_count =  inverse_count + 1;
       end
     end
   end

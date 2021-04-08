@@ -61,7 +61,7 @@ for i = 1:N
     % T matrix definition - projection of base vectors to null space
     T = V2'*-T_base;
     % Check the condition for matrix inversion
-    not_solvable = any(To_v2 > sum(max(T,0)')') + any(To_v2 < sum(min(T,0)')') > 0;
+    not_solvable = any(To_v2 > sum(max(T,0)')',1) + any(To_v2 < sum(min(T,0)')',1) > 0;
     if all(not_solvable)  % if none of the 2^m systems is solvable dont invert matrix
       continue;
     end 
@@ -84,7 +84,7 @@ for i = 1:N
     
     % add vertex torque
     t_vert = [t_vert To+T_base*Alpha]; 
-    inverse_count++;
+    inverse_count = inverse_count + 1;
   end
   % calculate the forces based on the vertex torques
 f_vert = pinv(J_n')*( t_vert );
