@@ -4,3 +4,6 @@
 [submodule "pycapacity"]
 	path = pycapacity
 	url = git@gitlab.inria.fr:askuric/pycapacity.git
+[submodule "ROS_nodes/panda_capacity/scripts/capacity/pycapacity"]
+	path = ROS_nodes/panda_capacity/scripts/capacity/pycapacity
+	url = git@gitlab.inria.fr:askuric/pycapacity.git

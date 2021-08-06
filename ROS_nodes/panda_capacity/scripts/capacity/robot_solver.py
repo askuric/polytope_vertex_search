@@ -2,10 +2,7 @@
 import numpy as np
 
 # polytope python module
-import capacity_solver
-
-# minkowski sum
-from scipy.spatial import ConvexHull, Delaunay
+import pycapacity.pycapacity as capacity_solver
 
 # URDF parsing an kinematics 
 from urdf_parser_py.urdf import URDF
