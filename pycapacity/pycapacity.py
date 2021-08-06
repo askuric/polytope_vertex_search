@@ -5,11 +5,21 @@ import numpy.matlib
 import itertools
 
 # minkowski sum
-from scipy.spatial import ConvexHull, Delaunay
+from scipy.spatial import ConvexHull
 
 
 # velocity manipulability calculation
 def manipulability_velocity(Jacobian_position, dq_max):
+    """
+    velocity manipulability calculation
+
+    Args:
+        param1: Jacobian_position position jacobian
+        param2: dq_max maximal joint velocities
+    Returns: 
+        list:  list of singular values S
+        array: the matrix U
+    """ 
     # jacobian calculation
     Jac = Jacobian_position
     # limits scaling
@@ -21,6 +31,15 @@ def manipulability_velocity(Jacobian_position, dq_max):
 
 # force manipulability calculation
 def manipulability_force(Jacobian_position, t_max):
+    """
+    force manipulability calculation
+    Args:
+        param1: Jacobian_position position jacobian
+        param2: t_max maximal joint torques
+    Returns: 
+        list:  list of singular values 1/S
+        array: the matrix U
+    """ 
     # jacobian calculation
     Jac = Jacobian_position
     # limits scaling
@@ -31,8 +50,22 @@ def manipulability_force(Jacobian_position, t_max):
     return [np.divide(1,S), U]
 
 # maximal end effector force
-def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2):
+def force_polytope_intersection(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2):
+    """
+    Force polytope representing the intersection of the capacities of the two robots in certain configurations.
 
+
+    Args:
+        param1: Jacobian1 position jacobian robot 1
+        param2: Jacobian2 position jacobian robot 2
+        param3: t_max1 maximal joint torques robot 1
+        param4: t_max2 maximal joint torques robot 2
+        param5: gravity1 applied joint torques (for example gravity vector  or J^T*f ) robot 1
+        param6: gravity2 maximal joint torques (for example gravity vector  or J^T*f ) robot 2
+
+    Returns:
+        list: f_vertex vertices of the polytope
+    """
     # jacobian calculation
     Jac =  np.hstack((Jacobian1,Jacobian2))
     t_min = np.vstack((t1_min,t2_min))
@@ -42,13 +75,29 @@ def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_
     else:
         gravity = np.vstack((gravity1, gravity2))
 
-    return force_polytope_auctus(Jac, t_max,t_min, gravity)
+    return force_polytope(Jac, t_max,t_min, gravity)
 
 # maximal end effector force
-def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1 = None, gravity2 = None):
+def force_polytope_sum_withfaces(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1 = None, gravity2 = None):
+    """
+    Force polytope representing the minkowski sum of the capacities of the two robots in certain configurations.
+    With ordered vertices into the faces.
+
+    Args:
+        param1: Jacobian1 position jacobian robot 1
+        param2: Jacobian2 position jacobian robot 2
+        param3: t_max1 maximal joint torques robot 1
+        param4: t_max2 maximal joint torques robot 2
+        param5: gravity1 applied joint torques (for example gravity vector  or J^T*f ) robot 1
+        param6: gravity2 maximal joint torques (for example gravity vector  or J^T*f ) robot 2
+
+    Returns:
+        list: f_vertex vertices of the polytope
+        list: polytope_faces faces of the polytope
+    """ 
     # calculate two polytopes
-    f_vertex1, t_vertex1, gravity1 = force_polytope_auctus(Jacobian1, t1_max, t1_min, gravity1)
-    f_vertex2, t_vertex2, gravity2 = force_polytope_auctus(Jacobian2, t2_max, t2_min, gravity2)
+    f_vertex1, t_vertex1, gravity1 = force_polytope(Jacobian1, t1_max, t1_min, gravity1)
+    f_vertex2, t_vertex2, gravity2 = force_polytope(Jacobian2, t2_max, t2_min, gravity2)
     # then do a minkowski sum
     m, n = Jacobian1.shape
     f_sum = np.zeros((f_vertex1.shape[1]*f_vertex2.shape[1],m))
@@ -66,8 +115,18 @@ def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_
     return f_vertex, polytope_faces
 
 # maximal end effector force
-def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
+def force_polytope(Jacobian, t_max, t_min, gravity = None):
+    """
+    Force polytope representing the capacities of the two robots in a certain configuration
 
+    Args:
+        param1: Jacobian1 position jacobian 
+        param3: t_max1 maximal joint torques 
+        param5: gravity1 applied joint torques (for example gravity vector  or J^T*f )  
+
+    Returns:
+        list: f_vertex vertices of the polytope
+    """ 
     # jacobian calculation
     Jac = Jacobian
     m, n = Jac.shape
@@ -143,8 +202,21 @@ def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
     f_vertex = J_n_invT.dot( t_vertex )
     return f_vertex, t_vertex, gravity
     
-def force_polytope_ordered(Jacobian, t_max, t_min, gravity = None):
-    force_vertex, t_vertex, gravity = force_polytope_auctus(Jacobian, t_max, t_min, gravity)
+def force_polytope_withfaces(Jacobian, t_max, t_min, gravity = None):
+    """
+    Force polytope representing the capacities of the two robots in a certain configuration.
+    With vertices ordered into the faces
+
+    Args:
+        param1: Jacobian1 position jacobian 
+        param3: t_max1 maximal joint torques 
+        param5: gravity1 applied joint torques (for example gravity vector  or J^T*f )  
+
+    Returns:
+        list: f_vertex vertices of the polytope
+        list: polytope_faces faces of the polytope
+    """ 
+    force_vertex, t_vertex, gravity = force_polytope(Jacobian, t_max, t_min, gravity)
     m, n = Jacobian.shape
     
     polytope_faces = []
@@ -168,8 +240,24 @@ def force_polytope_ordered(Jacobian, t_max, t_min, gravity = None):
                     polytope_faces.append(fi)
     return [force_vertex, polytope_faces]
 
-def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1=None, gravity2=None):
-    force_vertex, t_vertex, gravity = force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2)
+def force_polytope_intersection_withfaces(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1=None, gravity2=None):
+    """
+    Force polytope representing the intersection of the capacities of the two robots in certain configurations.
+    With ordered vertices into the faces.
+
+    Args:
+        param1: Jacobian1 position jacobian robot 1
+        param2: Jacobian2 position jacobian robot 2
+        param3: t_max1 maximal joint torques robot 1
+        param4: t_max2 maximal joint torques robot 2
+        param5: gravity1 applied joint torques (for example gravity vector  or J^T*f ) robot 1
+        param6: gravity2 maximal joint torques (for example gravity vector  or J^T*f ) robot 2
+
+    Returns:
+        list: f_vertex vertices of the polytope
+        list: polytope_faces faces of the polytope
+    """
+    force_vertex, t_vertex, gravity = force_polytope_intersection(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min, gravity1, gravity2)
     m, n = Jacobian1.shape
     t_max_int = np.vstack((t1_max,t2_max))
     t_min_int = np.vstack((t1_min,t2_min))
@@ -192,6 +280,13 @@ def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2
 
 
 def make_2d(points):
+    """
+    Take a list of 3D(cooplanar) points and make it 2D
+    Args:
+        param1: points matrix of 3D points
+    Returns:
+        array:  list array of 2D points
+    """
     U = points[:,1]-points[:,0]   # define 1st ortogonal vector
     for i in range(2, points.shape[1]): # find 2nd ortogonal vector (avoid collinear)
         V = points[:,i]-points[:,0]
@@ -210,6 +305,13 @@ def make_2d(points):
     return np.array([x, y])
 
 def order_index(points):
+    """
+    Order clockwise 2D points
+    Args:
+        param1: points matrix of 2D points
+    Returns:
+        array: ordered indexes
+    """
     px = np.array(points[0,:]).ravel()
     py = np.array(points[1,:]).ravel()
     p_mean = np.array(np.mean(points,axis=1)).ravel()
@@ -219,9 +321,17 @@ def order_index(points):
     return sort_index
 
 def make_unique(points):
+    """
+    Remove repetitions of columns
+
+    Args:
+        param1: points matrix of n-dim points
+    Returns:
+        array: matrix with only unique pints
+    """
     unique_points = np.unique(np.around(points,7), axis=1)
     return unique_points
          
 # definition of the four_link_solver module
 if __name__ == '__main__':
-    capacity_solver() 
+    print('imported capacity solver')

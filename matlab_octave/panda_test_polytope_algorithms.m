@@ -54,13 +54,13 @@ mean(count_pierrot)
 max(count_pierrot)
 std(count_pierrot)
 
-figure(1)
+figure(10)
 hold on
 plot(t_auctus)
 plot(t_sasaki)
 plot(t_pierrot)
 legend('auctus','sasaki','pierrot')
-figure(2)
+figure(20)
 hold on
 plot(count_auctus)
 plot(count_sasaki)

@@ -1,7 +1,7 @@
 # On-line force capability evaluation based on efficient polytope vertex search
 
 *by Antun Skuric, Vincent Padois, David Daney*<br>
-*Submitted to ICRA2021*
+*Published at ICRA2021*
 
 <img src="images/rviz_screenshot_2020.png" height="250px">
 
@@ -11,7 +11,7 @@ This repository consists of
 - [Matlab/octave implementation](#matlab-octave-testing-scripts)
     - full modular algorithm implementation
     - benchmarking comparison of three vertex search algorithms for *FRANKA Emika Panda* and *UR5* robot
-- [Python module for calculating robot capacity](#python-capacity-module)
+- [Python module for calculating robot capacity](#python-capacity-module) `pycapacity`
     - force polytope
     - force/velocity manipulability ellipsoid
     - quick demo jupyter script
@@ -50,41 +50,21 @@ P.Chiacchio, Pierrot et al.*
 
 ## Python capacity module
 
-In the directory `python_module` you can find the generic robot capacity calculation module called `robot_capacity_solver` which you can easily integrate in your python project, for example
+In this directory you can find the generic robot capacity calculation module called `pycapacityRT` which you can easily integrate in your python project, for example
 ```python
-import robot_capacity_solver as capacity
+import pycapacityRT.pycapacity as capacity
 ```
-This module has set of functions for calculation and visualization of robot force capabilities
-```python
-# velocity manipulability calculation
-# returns list with singular values and matrix U
-def manipulability_velocity(Jacobian, dq_max):
-# force manipulability calculation
-# returns list with singular values and matrix U
-def manipulability_force(Jacobian, t_max):
-```
-```python
-# force polytope vertex search
-# returns list of force vertices and torque vertices
-def force_polytope_auctus(Jacobian, t_max, t_min, gravity = None):
-#  structured polytope function for visualisaiton
-# returns the force vertices and face polygons with ordered vertices
-def force_polytope_ordered(Jacobian, t_max, t_min, gravity = None):
-```
-```python
-# interseciton of force polytopes of two robots
-# returns list of force vertices and torque vertices
-def force_polytope_intersection_auctus(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
-# structured interseciton of force polytopes of two robots 
-# returns the force vertices and face polygons with ordered vertices
-def force_polytope_intersection_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
-```
-```python
-# structured minkowski sum of force polytopes of two robots 
-# returns the force vertices and face polygons with ordered vertices
-def force_polytope_sum_ordered(Jacobian1, Jacobian2, t1_max, t1_min, t2_max, t2_min):
-```
-See [`demo_notebook.ipynb`](python_module/demo_notebook.ipynb) for one example use case of the module.
+### Module functions
+- [`force_polytope`](./pycapacity/docs/pycapacity.md#function-force_polytope): Force polytope representing the capacities of the two robots in a certain configuration
+- [`force_polytope_intersection`](./pycapacity/docs/pycapacity.md#function-force_polytope_intersection): Force polytope representing the intersection of the capacities of the two robots in certain configurations.
+- [`force_polytope_intersection_withfaces`](./pycapacity/docs/pycapacity.md#function-force_polytope_intersection_withfaces): Force polytope representing the intersection of the capacities of the two robots in certain configurations.
+- [`force_polytope_sum_withfaces`](./pycapacity/docs/pycapacity.md#function-force_polytope_sum_withfaces): Force polytope representing the minkowski sum of the capacities of the two robots in certain configurations.
+- [`force_polytope_withfaces`](./pycapacity/docs/pycapacity.md#function-force_polytope_withfaces): Force polytope representing the capacities of the two robots in a certain configuration.
+- [`manipulability_force`](./pycapacity/docs/pycapacity.md#function-manipulability_force): force manipulability calculation
+- [`manipulability_velocity`](./pycapacity/docs/pycapacity.md#function-manipulability_velocity): velocity manipulability calculation
+---
+
+See [`demo_notebook.ipynb`](./pycapacity/demo_notebook.ipynb) for one example use case of the module.
 
 ## ROS panda capacity package
 In the `ROS_nodes` directory you can find the implementation of the python capacity module for a specific use case of Panda robot. The directory consists of two ros packages:
