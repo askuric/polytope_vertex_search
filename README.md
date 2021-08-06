@@ -50,9 +50,9 @@ P.Chiacchio, Pierrot et al.*
 
 ## Python capacity module
 
-In this directory you can find the generic robot capacity calculation module called `pycapacityRT` which you can easily integrate in your python project, for example
+In this directory you can find the generic robot capacity calculation module called `pycapacity` which you can easily integrate in your python project, for example
 ```python
-import pycapacityRT.pycapacity as capacity
+import pycapacity.pycapacity as capacity
 ```
 ### Module functions
 - [`force_polytope`](./pycapacity/docs/pycapacity.md#function-force_polytope): Force polytope representing the capacities of the two robots in a certain configuration
