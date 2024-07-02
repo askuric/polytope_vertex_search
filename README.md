@@ -18,6 +18,9 @@ This repository consists of
 - [ROS node for *FRANKA Emika Panda* robot](#ros-panda-capacity-package)
 
 
+> The python code is implemented in pycapcity [package](https://github.com/auctus-team/pycapacity)<br> 
+> ![out](https://github.com/askuric/polytope_vertex_search/assets/36178713/5ad1ffe9-42bd-439c-962d-5728c8d938ed)
+
 
 ## Matlab / Octave testing scripts
 
